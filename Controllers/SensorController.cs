@@ -1,22 +1,29 @@
-﻿using API_SensorUltrasonico.Models;
+﻿using API_SensorUltrasonico.Conexion;
+using API_SensorUltrasonico.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_SensorUltrasonico.Controllers
 {
-    public class SensorController
+    [Route("api/[controller]")]
+    [ApiController]
+    public class SensorController: ControllerBase
     {
-        [Route("api/[controller]")]
-        [ApiController]
-        public class RegistroController : ControllerBase
+        [HttpGet]
+        [Route("MostrarDatosSensor")]
+        public IActionResult MostrarDatosSensor(int idUsuario)
         {
-            [HttpGet("{id}")]
-            public IActionResult MostrarDatosSensor(SensorModelo parametros)
-            {
-                RespuestaModelo respuesta = new RespuestaModelo();
+            RespuestaModelo respuesta = new RespuestaModelo();
+            using (SensorUltrasonicoContext db = new SensorUltrasonicoContext())
+            {                
                 try
                 {
+                    var datosRegistro = db.Sensors
+                    .Where(x => x.IdUsuario == idUsuario)
+                    .OrderByDescending(x => x.Fecha)
+                    .ToList();
+
                     respuesta.Estado = "Ok";
-                    respuesta.Contenido = parametros;
+                    respuesta.Contenido = datosRegistro;
                     return Ok(respuesta);
                 }
                 catch (Exception ex)
@@ -25,24 +32,40 @@ namespace API_SensorUltrasonico.Controllers
                     respuesta.Error = ex.Message;
                     return BadRequest(respuesta);
                 }
-            }
+            }            
+        }
 
-            [HttpPost("{id}")]
-            public IActionResult RegistrarDatosSensor(SensorModelo parametros)
+        [HttpPost]
+        [Route("RegistrarDatosSensor")]
+        public IActionResult RegistrarDatosSensor(SensorModelo parametros)
+        {            
+            using (SensorUltrasonicoContext db = new SensorUltrasonicoContext())
             {
-                RespuestaModelo respuesta = new RespuestaModelo();
+                RespuestaModelo respuesta = new RespuestaModelo();                
+
                 try
                 {
-                    respuesta.Estado = "Ok";                
-                    return Ok();
+                    Sensor datosRegistro = new Sensor
+                    {
+                        Fecha = DateTime.Now,
+                        Sensor1 = parametros.Sensor,
+                        IdUsuario = parametros.IdUsuario
+                    };
+
+                    db.Sensors.Add(datosRegistro);
+                    db.SaveChanges();
+
+                    respuesta.Estado = "Ok";
+                    return Ok(respuesta);
                 }
                 catch (Exception ex)
                 {
-                    respuesta.Estado= "error";
+                    respuesta.Estado = "error";
                     respuesta.Error = ex.Message;
                     return BadRequest(respuesta);
                 }
-            }
-        }        
+            }            
+        }
     }
 }
+

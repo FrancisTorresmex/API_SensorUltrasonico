@@ -7,6 +7,8 @@ string policy = "MyPolicy";
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddControllers(); //añadir uso de controladores
+
 //Agregar CORS
 builder.Services.AddCors(options => {
     options.AddPolicy(name: policy, builder =>
@@ -27,6 +29,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 app.UseCors(policy); //usar CORS
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();

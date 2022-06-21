@@ -1,46 +1,79 @@
-﻿using API_SensorUltrasonico.Models;
+﻿using API_SensorUltrasonico.Conexion;
+using API_SensorUltrasonico.Models;
 using Microsoft.AspNetCore.Mvc;
 
 
 
 namespace API_SensorUltrasonico.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]    
     public class RegistroController : ControllerBase
     {                 
-        [HttpGet("{id}")]
-        public IActionResult MostrarUsuario(RegistroModelo parametros)
+        [HttpGet]
+        [Route("MostrarUsuario")]
+        public IActionResult MostrarUsuario(int idUsuario)
         {
             RespuestaModelo respuesta = new RespuestaModelo();
-            try
+
+            using (SensorUltrasonicoContext db = new SensorUltrasonicoContext())
             {
-                respuesta.Estado = "Ok";
-                respuesta.Contenido = parametros;
-                return Ok(respuesta);
-            }
-            catch (Exception ex)
-            {
-                respuesta.Error = ex.Message;
-                respuesta.Estado = "error";
-                return BadRequest(respuesta);
-            }
+                try
+                {
+
+                    var datosRegistro = db.Registros.Where(x => x.IdUsuario == idUsuario).ToList();
+                    if (datosRegistro != null || datosRegistro.Count > 0)
+                    {
+                        respuesta.Estado = "Ok";
+                        respuesta.Contenido = datosRegistro;
+                    }
+                    return Ok(respuesta);
+                }
+                catch (Exception ex)
+                {
+                    respuesta.Error = ex.Message;
+                    respuesta.Estado = "error";
+                    return BadRequest(respuesta);
+                }                
+            }            
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
+        [Route("RegistroUsuario")]
         public IActionResult RegistroUsuario(RegistroModelo parametros)
         {
             RespuestaModelo respuesta = new RespuestaModelo();
-            try
+            using (SensorUltrasonicoContext db = new SensorUltrasonicoContext())
             {
-                respuesta.Estado = "Ok";                
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                respuesta.Error = ex.Message;
-                respuesta.Estado = "error";
-                return BadRequest(respuesta);
+                try
+                {                    
+                    var existeCorreo = db.Registros.Where(x => x.Correo == parametros.Correo).FirstOrDefault();
+
+                    if (existeCorreo != null) //si ya existe el correo
+                    {
+                        respuesta.Estado = "Ok";
+                        respuesta.Error = "El correo ya existe";
+                        return Ok(respuesta);
+                    }
+
+                    Registro datosRegistro = new Registro
+                    {
+                        Correo = parametros.Correo,
+                        Edad = parametros.Edad,
+                        Nombre = parametros.Nombre
+                    };
+                    db.Registros.Add(datosRegistro);
+                    db.SaveChanges();
+
+                    respuesta.Estado = "Ok";
+                    return Ok(respuesta);
+                }
+                catch (Exception ex)
+                {
+                    respuesta.Error = ex.Message;
+                    respuesta.Estado = "error";
+                    return BadRequest(respuesta);
+                }
             }            
         }
 

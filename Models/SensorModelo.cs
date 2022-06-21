@@ -2,8 +2,9 @@
 {
     public class SensorModelo
     {
-        public Guid IdUsuario { get; set; }
+        public int IdRegistro { get; set; }
         public string? Sensor { get; set; }
         public DateTime Fecha { get; set; }        
+        public int IdUsuario { get; set; }  
     }
 }
