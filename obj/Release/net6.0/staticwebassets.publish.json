@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "6exUTQt65ae8NGK/UHZpCZaEcQ4KmSLrrkfN/N15bmM=",
+  "Source": "API_SensorUltrasonico",
+  "BasePath": "_content/API_SensorUltrasonico",
+  "Mode": "Default",
+  "ManifestType": "Publish",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

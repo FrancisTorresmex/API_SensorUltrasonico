@@ -14,6 +14,8 @@ namespace API_SensorUltrasonico.Conexion
         public string Nombre { get; set; } = null!;
         public int Edad { get; set; }
         public string Correo { get; set; } = null!;
+        public string? Telefono { get; set; }
+        public string? Mensaje { get; set; }
 
         public virtual ICollection<Sensor> Sensors { get; set; }
     }

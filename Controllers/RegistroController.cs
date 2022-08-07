@@ -17,7 +17,7 @@ namespace API_SensorUltrasonico.Controllers
             RespuestaModelo respuesta = new RespuestaModelo();
 
             using (SensorUltrasonicoContext db = new SensorUltrasonicoContext())
-            {
+            {                
                 try
                 {
 
@@ -27,14 +27,15 @@ namespace API_SensorUltrasonico.Controllers
                         respuesta.Estado = "Ok";
                         respuesta.Contenido = datosRegistro;
                     }
-                    return Ok(respuesta);
+                    return Ok(respuesta);                    
                 }
+                
                 catch (Exception ex)
                 {
                     respuesta.Error = ex.Message;
                     respuesta.Estado = "error";
                     return BadRequest(respuesta);
-                }                
+                }                       
             }            
         }
 
@@ -48,6 +49,7 @@ namespace API_SensorUltrasonico.Controllers
                 try
                 {                    
                     var existeCorreo = db.Registros.Where(x => x.Correo == parametros.Correo).FirstOrDefault();
+                    var existeTel = db.Registros.Where(x => x.Telefono == parametros.Telefono).FirstOrDefault();
 
                     if (existeCorreo != null) //si ya existe el correo
                     {
@@ -55,12 +57,20 @@ namespace API_SensorUltrasonico.Controllers
                         respuesta.Error = "El correo ya existe";
                         return Ok(respuesta);
                     }
+                    if (existeTel != null) //si ya existe el correo
+                    {
+                        respuesta.Estado = "Ok";
+                        respuesta.Error = "Telefono ya registrado en una cuenta";
+                        return Ok(respuesta);
+                    }
 
                     Registro datosRegistro = new Registro
                     {
                         Correo = parametros.Correo,
                         Edad = parametros.Edad,
-                        Nombre = parametros.Nombre
+                        Nombre = parametros.Nombre,
+                        Telefono = parametros.Telefono,
+                        Mensaje = parametros.Mensaje
                     };
                     db.Registros.Add(datosRegistro);
                     db.SaveChanges();
